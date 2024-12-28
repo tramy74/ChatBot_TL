@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Database files (if any)
+*.sqlite3
+
+# IDE-specific files
+.vscode/
+git init
+git add .
+git commit -m "Initial commit: Project setup and environment configuration"
+
+[pytest]
+pythonpath = .
