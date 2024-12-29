@@ -174,9 +174,10 @@
 #     answer = handle_user_question(question.question)
 #     return {"answer": answer}
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 from dotenv import load_dotenv
 from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
@@ -211,17 +212,39 @@ query_engine = index.as_query_engine(similarity_top_k=3, streaming=True)
 class Query(BaseModel):
     question: str
 
-@app.post("/query")
-async def get_answer(query: Query):
-    response = query_engine.query(query.question)
+# @app.post("/query")
+# async def get_answer(query: Query, ):
+#     response = query_engine.query(query.question)
 
-    # Capture and process the response stream
+#     # Capture and process the response stream
+#     answer_stream = StringIO()
+#     with contextlib.redirect_stdout(answer_stream):
+#         response.print_response_stream()
+#     answer = answer_stream.getvalue().strip()
+
+#     # Handle empty or invalid responses
+#     if not answer or "external source" in answer.lower():
+#         answer = "Không có dữ liệu."
+
+#     return {"answer": answer}
+
+@app.post("/query")
+async def get_answer(question: str = Form(...), file: UploadFile = None):
+    # Xử lý file nếu có
+    if file:
+        file_content = await file.read()
+        # Tại đây bạn có thể thêm logic để xử lý và lưu trữ file
+        # e.g., extract content and re-index it
+        print(f"File received: {file.filename}")
+
+    # Xử lý câu hỏi bình thường
+    response = query_engine.query(question)
     answer_stream = StringIO()
     with contextlib.redirect_stdout(answer_stream):
         response.print_response_stream()
     answer = answer_stream.getvalue().strip()
 
-    # Handle empty or invalid responses
+    # Trả lời mặc định nếu không tìm thấy dữ liệu
     if not answer or "external source" in answer.lower():
         answer = "Không có dữ liệu."
 

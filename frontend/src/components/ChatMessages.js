@@ -9,7 +9,7 @@ const ChatMessages = ({ conversations }) => {
   }, [conversations]);
 
   return (
-    <div className="w-full max-w-5xl px-4">
+    <div className="flex flex-col space-y-4 p-4">
       {conversations.map((conv, index) => (
         <div key={index} className="space-y-2">
           {/* User's Question */}

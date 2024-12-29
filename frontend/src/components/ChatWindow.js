@@ -21,7 +21,7 @@ const ChatWindow = ({
 
       {/* Chat Messages */}
       <div
-        className={`flex-1 overflow-y-auto ${
+        className={`flex-1 overflow-y-auto px-4 ${
           !hasConversations && "flex items-center justify-center my-4"
         }`}
         style={{ maxHeight: "calc(100vh - 198px)" }} // Adjust the height dynamically

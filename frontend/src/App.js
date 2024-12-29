@@ -27,23 +27,30 @@ function App() {
     localStorage.setItem("chatSessions", JSON.stringify(chatSessions));
   }, [chatSessions]);
 
-  const handleSubmit = async (question) => {
-    if (!question || !question.trim()) return; // Handle undefined or empty input
+  const handleSubmit = async (question, file) => {
+    if (!question || !question.trim()) return;
     if (question.length > MAX_QUESTION_LENGTH) {
-      setErrorMessage(`Question exceeds maximum length of ${MAX_QUESTION_LENGTH} characters.`);
+      setErrorMessage(
+        `Question exceeds maximum length of ${MAX_QUESTION_LENGTH} characters.`
+      );
       return;
     }
     setErrorMessage("");
-  
+
+    const formData = new FormData();
+    formData.append("question", question);
+    if (file) {
+      formData.append("file", file);
+    }
+
     try {
       const response = await fetch("http://localhost:8000/query", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
+        body: formData,
       });
-  
+
       const data = await response.json();
-      const answer = data.answer || "No data available.";
+      const answer = data.answer || "Không có dữ liệu.";
 
       const newConversations = [...conversations, { question, answer }];
       setConversations(newConversations);
@@ -51,13 +58,12 @@ function App() {
       if (!currentSession) {
         const newSession = {
           id: Date.now(),
-          name: question, // Use the first question as the name
+          name: question,
           messages: newConversations,
         };
         setChatSessions((prev) => [...prev, newSession]);
         setCurrentSession(newSession);
       } else {
-        // Update the existing session
         const updatedSessions = chatSessions.map((session) =>
           session.id === currentSession.id
             ? { ...session, messages: newConversations }
@@ -65,16 +71,11 @@ function App() {
         );
         setChatSessions(updatedSessions);
       }
-  
-      //setConversations((prev) => [...prev, { question, answer }]);
     } catch (error) {
       console.error("Error fetching the response:", error);
     }
   };
-  
 
-
-  
   const handleNewChat = () => {
     setConversations([]);
     setCurrentSession(null);
@@ -96,15 +97,17 @@ function App() {
       />
       <div className="flex flex-col flex-1">
         {errorMessage && (
-          <div className="bg-red-100 text-red-700 p-2 text-center">{errorMessage}</div>
+          <div className="bg-red-100 text-red-700 p-2 text-center">
+            {errorMessage}
+          </div>
         )}
-      <ChatWindow
-        currentSession={currentSession}
-        conversations={conversations}
-        question={question} // Current question state
-        setQuestion={setQuestion} // Pass setQuestion to update question
-        handleSubmit={handleSubmit}
-      />
+        <ChatWindow
+          currentSession={currentSession}
+          conversations={conversations}
+          question={question} // Current question state
+          setQuestion={setQuestion} // Pass setQuestion to update question
+          handleSubmit={handleSubmit}
+        />
       </div>
     </div>
   );
