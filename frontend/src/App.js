@@ -12,58 +12,55 @@ function App() {
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const storedSessions = JSON.parse(localStorage.getItem("chatSessions"));
-    if (storedSessions) {
-      setChatSessions(storedSessions);
-      if (storedSessions.length > 0) {
-        const lastSession = storedSessions[storedSessions.length - 1];
-        setCurrentSession(lastSession);
-        setConversations(lastSession.messages);
-      }
+    const storedSessions = JSON.parse(localStorage.getItem("chatSessions")) || [];
+    setChatSessions(storedSessions);
+  
+    if (storedSessions.length > 0) {
+      const lastSession = storedSessions[storedSessions.length - 1];
+      setCurrentSession(lastSession);
+      setConversations(lastSession.messages);
     }
   }, []);
-
+  
   useEffect(() => {
     localStorage.setItem("chatSessions", JSON.stringify(chatSessions));
   }, [chatSessions]);
+  
 
   const handleSubmit = async (question, file) => {
     if (!question || !question.trim()) return;
-    if (question.length > MAX_QUESTION_LENGTH) {
-      setErrorMessage(
-        `Question exceeds maximum length of ${MAX_QUESTION_LENGTH} characters.`
-      );
-      return;
-    }
-    setErrorMessage("");
-
+  
     const formData = new FormData();
     formData.append("question", question);
     if (file) {
-      formData.append("file", file);
+      formData.append("file", file); // Gửi file nếu có
     }
-
+  
     try {
       const response = await fetch("http://localhost:8000/query", {
         method: "POST",
         body: formData,
       });
-
       const data = await response.json();
-      const answer = data.answer || "Không có dữ liệu.";
-
-      const newConversations = [...conversations, { question, answer }];
+      const { question: firstQuestion, answer, file: fileInfo } = data;
+  
+      const newConversations = [
+        ...conversations,
+        { question: firstQuestion, answer, file: fileInfo },
+      ];
       setConversations(newConversations);
-
+  
+      // Trường hợp chưa có session nào
       if (!currentSession) {
         const newSession = {
           id: Date.now(),
-          name: question,
+          name: firstQuestion, // Tên session là câu hỏi đầu tiên
           messages: newConversations,
         };
         setChatSessions((prev) => [...prev, newSession]);
         setCurrentSession(newSession);
       } else {
+        // Trường hợp đã có session, cập nhật session hiện tại
         const updatedSessions = chatSessions.map((session) =>
           session.id === currentSession.id
             ? { ...session, messages: newConversations }
@@ -72,10 +69,10 @@ function App() {
         setChatSessions(updatedSessions);
       }
     } catch (error) {
-      console.error("Error fetching the response:", error);
+      console.error("Error:", error);
     }
   };
-
+  
   const handleNewChat = () => {
     setConversations([]);
     setCurrentSession(null);

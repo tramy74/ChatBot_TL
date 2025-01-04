@@ -2,7 +2,7 @@ import psycopg2
 
 def create_table():
     conn = psycopg2.connect(
-        dbname='chatbot_db', 
+        dbname='chatbot', 
         user='postgres', 
         password='TRAmy_1960%', 
         host='localhost', 
@@ -34,7 +34,7 @@ def read_text_file(file_path):
 
 def insert_book(title, content):
     conn = psycopg2.connect(
-        dbname='chatbot_db', 
+        dbname='chatbot', 
         user='postgres', 
         password='TRAmy_1960%', 
         host='localhost', 

@@ -29,7 +29,7 @@ def embed_text(file_path):
 
 def insert_vector(title, vector):
     conn = psycopg2.connect(
-        dbname='chatbot_db', 
+        dbname='chatbot', 
         user='postgres', 
         password='TRAmy_1960%', 
         host='localhost', 

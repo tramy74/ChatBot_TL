@@ -7,7 +7,7 @@ const Sidebar = ({ chatSessions, currentSession, onNewChat, onSelectSession }) =
   return (
     <div className="w-1/4 bg-gray-200 p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Learn-Bot</h2>
+        <h2 className="text-xl font-semibold">Chat Sessions</h2>
         <Tooltip title="New chat" arrow>
           <Button
             variant="contained"
@@ -30,7 +30,9 @@ const Sidebar = ({ chatSessions, currentSession, onNewChat, onSelectSession }) =
                 : ""
             }`}
           >
-            <p className="font-semibold">{session.name}</p>
+            <p className="font-semibold truncate">
+              {session.name || `Session ${index + 1}`}
+            </p>
           </div>
         ))}
       </div>

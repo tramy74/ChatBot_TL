@@ -12,7 +12,7 @@ import psycopg2
 
 # Kết nối tới cơ sở dữ liệu PostgreSQL
 connection = psycopg2.connect(
-    dbname='chatbot_db', 
+    dbname='chatbot', 
     user='postgres', 
     password='TRAmy_1960%', 
     host='localhost', 

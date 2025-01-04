@@ -230,23 +230,22 @@ class Query(BaseModel):
 
 @app.post("/query")
 async def get_answer(question: str = Form(...), file: UploadFile = None):
-    # Xử lý file nếu có
+    file_info = None
     if file:
         file_content = await file.read()
-        # Tại đây bạn có thể thêm logic để xử lý và lưu trữ file
-        # e.g., extract content and re-index it
-        print(f"File received: {file.filename}")
+        file_info = {
+            "filename": file.filename,
+            "size": len(file_content),
+            "type": file.content_type.split("/")[-1],  # Lấy loại file (PDF, PNG, ...)
+        }
 
-    # Xử lý câu hỏi bình thường
     response = query_engine.query(question)
     answer_stream = StringIO()
     with contextlib.redirect_stdout(answer_stream):
         response.print_response_stream()
     answer = answer_stream.getvalue().strip()
 
-    # Trả lời mặc định nếu không tìm thấy dữ liệu
     if not answer or "external source" in answer.lower():
         answer = "Không có dữ liệu."
 
-    return {"answer": answer}
-
+    return {"question": question, "answer": answer, "file": file_info}
