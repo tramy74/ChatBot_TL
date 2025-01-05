@@ -52,17 +52,20 @@ class Query(BaseModel):
 
 #     return {"answer": answer}
 
+from typing import List
+
 @app.post("/query")
-async def get_answer(question: str = Form(...), file: UploadFile = None):
-    file_info = None
-    if file:
+async def get_answer(question: str = Form(...), files: List[UploadFile] = File(None)):
+    file_info_list = []
+    for file in files:
         file_content = await file.read()
         file_info = {
             "filename": file.filename,
             "size": len(file_content),
-            "type": file.content_type.split("/")[-1],  # Lấy loại file (PDF, PNG, ...)
+            "type": file.content_type.split("/")[-1],  # File type
         }
-
+        file_info_list.append(file_info)
+    
     response = query_engine.query(question)
     answer_stream = StringIO()
     with contextlib.redirect_stdout(answer_stream):
@@ -72,4 +75,5 @@ async def get_answer(question: str = Form(...), file: UploadFile = None):
     if not answer or "external source" in answer.lower():
         answer = "Không có dữ liệu."
 
-    return {"question": question, "answer": answer, "file": file_info}
+    return {"question": question, "answer": answer, "files": file_info_list}
+

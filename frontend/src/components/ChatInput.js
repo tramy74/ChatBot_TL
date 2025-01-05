@@ -9,12 +9,12 @@ export default function ChatInput({ question, onChange, onSubmit, disableInput }
 
   const handleSend = () => {
     if (onSubmit && !disableInput) {
-      onSubmit(question, selectedFiles[0]); // Gửi file đầu tiên (nếu có)
-      onChange(""); // Xóa câu hỏi
-      setSelectedFiles([]); // Xóa danh sách file
+        onSubmit(question, selectedFiles); // Send all selected files
+        onChange(""); // Clear the question input
+        setSelectedFiles([]); // Clear selected files
     }
-  };
-  
+};
+
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);

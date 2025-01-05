@@ -27,51 +27,49 @@ function App() {
   }, [chatSessions]);
   
 
-  const handleSubmit = async (question, file) => {
+  const handleSubmit = async (question, files) => {
     if (!question || !question.trim()) return;
-  
+
     const formData = new FormData();
     formData.append("question", question);
-    if (file) {
-      formData.append("file", file); // Gửi file nếu có
-    }
-  
+    files.forEach((file) => {
+        formData.append("files", file); // Send each file
+    });
+
     try {
-      const response = await fetch("http://localhost:8000/query", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await response.json();
-      const { question: firstQuestion, answer, file: fileInfo } = data;
-  
-      const newConversations = [
-        ...conversations,
-        { question: firstQuestion, answer, file: fileInfo },
-      ];
-      setConversations(newConversations);
-  
-      // Trường hợp chưa có session nào
-      if (!currentSession) {
-        const newSession = {
-          id: Date.now(),
-          name: firstQuestion, // Tên session là câu hỏi đầu tiên
-          messages: newConversations,
-        };
-        setChatSessions((prev) => [...prev, newSession]);
-        setCurrentSession(newSession);
-      } else {
-        // Trường hợp đã có session, cập nhật session hiện tại
-        const updatedSessions = chatSessions.map((session) =>
-          session.id === currentSession.id
-            ? { ...session, messages: newConversations }
-            : session
-        );
-        setChatSessions(updatedSessions);
-      }
+        const response = await fetch("http://localhost:8000/query", {
+            method: "POST",
+            body: formData,
+        });
+        const data = await response.json();
+        const { question: firstQuestion, answer, files: fileInfoList } = data;
+
+        const newConversations = [
+            ...conversations,
+            { question: firstQuestion, answer, files: fileInfoList },
+        ];
+        setConversations(newConversations);
+
+        if (!currentSession) {
+            const newSession = {
+                id: Date.now(),
+                name: firstQuestion,
+                messages: newConversations,
+            };
+            setChatSessions((prev) => [...prev, newSession]);
+            setCurrentSession(newSession);
+        } else {
+            const updatedSessions = chatSessions.map((session) =>
+                session.id === currentSession.id
+                    ? { ...session, messages: newConversations }
+                    : session
+            );
+            setChatSessions(updatedSessions);
+        }
     } catch (error) {
-      console.error("Error:", error);
+        console.error("Error:", error);
     }
-  };
+};
   
   const handleNewChat = () => {
     setConversations([]);
