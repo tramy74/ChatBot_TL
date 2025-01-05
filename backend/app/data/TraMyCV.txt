@@ -1,0 +1,60 @@
+NGUYEN PHAN TRA MY
+(+84) 937 091 764 | ngphantramy@gmail.com | https://github.com/tramy74 |
+www.linkedin.com/in/mynguyenphan
+SUMMARY
+I am currently a software engineering student. I used to participate in web projects at school as a
+Frontend developer with Javascript programming language (especially React Js framework) . I am
+passionate about learning new technologies to increase the quality of work and I always look forward
+to sharing my knowledge with the members of the company. Hope I can contribute to the
+development of the company
+SKILL
+●
+Language: Javascript, HTML/CSS
+●
+Framework/ Platforms: ReactJs, Material UI, Tailwinds CSS, …
+●
+Database: MS SQL Server
+●
+Tools available: Figma, Github, VSCode
+●
+Other:
+-
+Good at problem-solving skills, requirement analysis, and teamwork skills.
+-
+Quick to learn new technologies, creative, eager to learn, and strive for progress
+WORK EXPERIENCE
+BAC - Business Analysis Training Center
+TA (June 2022 - August 2024): Support lecturers and students in the classroom: Take attendance, note
+down lesson content, homework, and assist in answering students' questions when they need.
+CERTIFICATIONS
+Big-O Coding:
+-
+Certified Big-O Green: Elementary Algorithms (2021)
+-
+Certified Big-O Blue: Intermediate Algorithms (2024)
+-
+Certified Big-O Orange: Advanced Algorithms (2024)
+EDUCATION
+Ho Chi Minh City Pedagogical University (2021- 2025)
+Major: Software Engineering & Information Systems
+PROJECT
+●
+Unicorn Shop
+Description: I work on the project in several functions such as forgotten password,
+notification page, shopping cart, discount code information, shopping cart,...
+Team size: 5
+Position: Frontend
+Technology description: Node js, Javascript, React
+Source code: https://github.com/lethinh2003/Unicorn
+●
+Sapoche web
+Description: I work on projects in some function
+Team size: 5
+Position: Frontend
+Technology description: HTML, CSS
+Source code: https://github.com/tramy74/Sapoche_web
+●
+Import - Export Management System
+Description: I work on projects from end to end
+Team size: 5
+Source code: Bản báo cáo đềtài

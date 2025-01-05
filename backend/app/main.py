@@ -57,15 +57,19 @@ from typing import List
 @app.post("/query")
 async def get_answer(question: str = Form(...), files: List[UploadFile] = File(None)):
     file_info_list = []
-    for file in files:
-        file_content = await file.read()
-        file_info = {
-            "filename": file.filename,
-            "size": len(file_content),
-            "type": file.content_type.split("/")[-1],  # File type
-        }
-        file_info_list.append(file_info)
-    
+
+    # Check if files is None
+    if files:
+        for file in files:
+            file_content = await file.read()
+            file_info = {
+                "filename": file.filename,
+                "size": len(file_content),
+                "type": file.content_type.split("/")[-1],  # File type
+            }
+            file_info_list.append(file_info)
+
+    # Query the chatbot engine
     response = query_engine.query(question)
     answer_stream = StringIO()
     with contextlib.redirect_stdout(answer_stream):
@@ -76,4 +80,5 @@ async def get_answer(question: str = Form(...), files: List[UploadFile] = File(N
         answer = "Không có dữ liệu."
 
     return {"question": question, "answer": answer, "files": file_info_list}
+
 
