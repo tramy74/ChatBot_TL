@@ -7,6 +7,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core import Settings
 from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
 from io import StringIO
+
 import contextlib
 import os
 
@@ -25,7 +26,7 @@ app.add_middleware(
 
 # Load documents and set up the query engine
 documents = SimpleDirectoryReader("D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\data").load_data()
-llm = OpenAI(temperature=0, model="gpt-4o")
+llm = OpenAI(temperature=0, model="gpt-4o", api_key="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")
 Settings.llm = llm
 Settings.chunk_size =512
 
@@ -82,3 +83,17 @@ async def get_answer(question: str = Form(...), files: List[UploadFile] = File(N
     return {"question": question, "answer": answer, "files": file_info_list}
 
 
+UPLOAD_FOLDER = "D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.post("/upload")
+async def upload_file(file: UploadFile = File(...)):
+    # Create file path
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+
+    # Save the file to the uploads directory
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    
+    return {"filename": file.filename, "message": "File uploaded successfully!"}

@@ -1,78 +1,51 @@
 import os
-import psycopg2
-import openai
 import pytesseract
-import cv2
-from dotenv import load_dotenv
-from io import StringIO
+import fitz  # PyMuPDF for PDF processing
+from pathlib import Path
 
-load_dotenv()
+UPLOAD_FOLDER = "D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\uploads"
+DATA_FOLDER = "D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\data"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(DATA_FOLDER, exist_ok=True)
 
-# Connect to PostgreSQL
-def connect_to_db():
-    return psycopg2.connect(os.getenv("DATABASE_URL"))
+# Set Tesseract executable path (adjust to your system's path)
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-# Extract text from images in folders using OCR
-def extract_text_from_images(main_folder='SachVan11'):
-    hinh_folder = os.path.join(main_folder, 'Hinh')
-    all_text = {}
+def extract_text_from_pdf_with_images(upload_folder=UPLOAD_FOLDER, data_folder=DATA_FOLDER):
+    # Ensure data folder exists
+    os.makedirs(data_folder, exist_ok=True)
 
-    for image_folder in os.listdir(hinh_folder):
-        folder_path = os.path.join(hinh_folder, image_folder)
-        if os.path.isdir(folder_path):
-            text_output = []
-            print(f"Processing folder: {folder_path}")
+    for filename in os.listdir(upload_folder):
+        if filename.endswith(".pdf"):
+            pdf_path = os.path.join(upload_folder, filename)
+            text_output = ""
 
-            # Process each image file
-            for paragraph_image_file in sorted(os.listdir(folder_path)):
-                if paragraph_image_file.lower().endswith(('.png', '.jpg', '.jpeg')):
-                    image_path = os.path.join(folder_path, paragraph_image_file)
-                    paragraph_image = cv2.imread(image_path)
+            # Process the PDF
+            pdf_doc = fitz.open(pdf_path)
+            for page_num, page in enumerate(pdf_doc):
+                # Attempt to extract text directly
+                text = page.get_text()
+                if text.strip():
+                    text_output += text
+                else:
+                    # If no text is found, perform OCR
+                    pix = page.get_pixmap()
+                    image_path = os.path.join(upload_folder, f"{Path(filename).stem}_page_{page_num}.png")
+                    pix.save(image_path)
+                    try:
+                        ocr_text = pytesseract.image_to_string(image_path, lang="vie")  # Adjust the language as needed
+                        text_output += ocr_text
+                    except Exception as e:
+                        print(f"Error during OCR on page {page_num}: {e}")
+                    finally:
+                        os.remove(image_path)  # Clean up temporary image file
 
-                    if paragraph_image is not None:
-                        # Extract text using pytesseract
-                        paragraph_text = pytesseract.image_to_string(paragraph_image)
-                        text_output.append(paragraph_text)
+            # Save extracted text to the data folder
+            if text_output.strip():
+                txt_filename = os.path.join(data_folder, f"{Path(filename).stem}.txt")
+                with open(txt_filename, "w", encoding="utf-8") as txt_file:
+                    txt_file.write(text_output)
+                print(f"Extracted and saved text for {filename}")
 
-            # Join all extracted text from folder
-            all_text[image_folder] = "\n".join(text_output)
-
-    return all_text
-
-# Generate embeddings using OpenAI
-def generate_embedding(text):
-    response = openai.Embedding.create(input=text, model="text-embedding-ada-002")
-    return response["data"][0]["embedding"]
-
-# Store embeddings in PostgreSQL
-def store_image_text_embeddings_in_postgres(main_folder='SachVan11'):
-    conn = connect_to_db()
-    cursor = conn.cursor()
-
-    # Create table if it doesn't exist
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS image_text_embeddings (
-        id SERIAL PRIMARY KEY,
-        folder_name TEXT,
-        embedding float8[]
-    )
-    """)
-    conn.commit()
-
-    # Process images and store embeddings
-    all_text_data = extract_text_from_images(main_folder)
-    for folder_name, text in all_text_data.items():
-        if text:
-            embedding = generate_embedding(text)
-            cursor.execute(
-                "INSERT INTO image_text_embeddings (folder_name, embedding) VALUES (%s, %s)",
-                (folder_name, embedding)
-            )
-            conn.commit()
-            print(f"Stored embedding for folder {folder_name}")
-
-    cursor.close()
-    conn.close()
-
-# Call the function to store embeddings
-store_image_text_embeddings_in_postgres()
+if __name__ == "__main__":
+    extract_text_from_pdf_with_images()

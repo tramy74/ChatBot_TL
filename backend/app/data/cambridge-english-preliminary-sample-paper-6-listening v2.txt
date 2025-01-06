@@ -290,6 +290,9 @@ B
 C 
  
  
+ 
+ 
+ 
 2 
 3 
 Where are they at the moment? 
@@ -469,6 +472,9 @@ C
  
 7 
 Which goods are reduced in price in the store now? 
+ 
+ 
+ 
  
  
  
