@@ -2,6 +2,7 @@ import React from "react";
 import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Sidebar = ({ chatSessions, currentSession, onNewChat, onSelectSession }) => {
   return (

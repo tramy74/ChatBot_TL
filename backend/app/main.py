@@ -26,7 +26,7 @@ app.add_middleware(
 
 # Load documents and set up the query engine
 documents = SimpleDirectoryReader("D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\data").load_data()
-llm = OpenAI(temperature=0, model="gpt-4o", api_key="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")
+llm = OpenAI(temperature=0, model="gpt-4o", api_key=os.getenv("OPENAI_API_KEY"))
 Settings.llm = llm
 Settings.chunk_size =512
 
@@ -97,3 +97,4 @@ async def upload_file(file: UploadFile = File(...)):
         f.write(content)
     
     return {"filename": file.filename, "message": "File uploaded successfully!"}
+    
