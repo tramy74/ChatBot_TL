@@ -26,7 +26,7 @@ app.add_middleware(
 
 # Load documents and set up the query engine
 documents = SimpleDirectoryReader("D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\data").load_data()
-llm = OpenAI(temperature=0, model="gpt-4o", api_key=os.getenv("OPENAI_API_KEY"))
+llm = OpenAI(temperature=0, model="gpt-4o")
 Settings.llm = llm
 Settings.chunk_size =512
 
@@ -83,18 +83,3 @@ async def get_answer(question: str = Form(...), files: List[UploadFile] = File(N
     return {"question": question, "answer": answer, "files": file_info_list}
 
 
-UPLOAD_FOLDER = "D:\\DaiHoc\\ForthYear\\chatbot\\backend\\app\\uploads"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-@app.post("/upload")
-async def upload_file(file: UploadFile = File(...)):
-    # Create file path
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-
-    # Save the file to the uploads directory
-    with open(file_path, "wb") as f:
-        content = await file.read()
-        f.write(content)
-    
-    return {"filename": file.filename, "message": "File uploaded successfully!"}
-    
